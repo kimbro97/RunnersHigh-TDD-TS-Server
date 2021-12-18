@@ -19,7 +19,7 @@ const config: IConfigGroup = {
   "development": {
     "username": 'root',
     "password": process.env.DATABASE_PASSWORD!,
-    "database": "runnershigh2",
+    "database": "runnershigh",
     "host": process.env.DATABASE_HOST!,
     "dialect": "mysql"
   },
