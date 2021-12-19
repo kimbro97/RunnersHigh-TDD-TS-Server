@@ -19,7 +19,7 @@ Comment.init({
 }, {
   sequelize,
   modelName: 'Comment',
-  tableName: 'Comments',
+  tableName: 'comments',
   charset: 'utf8mb4', //  한글+이모티콘
   collate: 'utf8mb4_general_ci',
 })
