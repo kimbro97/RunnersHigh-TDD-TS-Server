@@ -5,7 +5,8 @@ import * as cors from 'cors'
 import * as cookieParser from 'cookie-parser'
 import {Server, Socket} from 'socket.io'
 import userRoute from './route/user'
-import 'dotenv/config'
+import * as dotenv from 'dotenv'
+dotenv.config()
 
 const app: Application = express()
 const server = http.createServer(app)
