@@ -19,7 +19,7 @@ Chatting.init({
 }, {
   sequelize,
   modelName: 'Chatting',
-  tableName: 'Chattings',
+  tableName: 'chattings',
   charset: 'utf8mb4', //  한글+이모티콘
   collate: 'utf8mb4_general_ci',
 })
