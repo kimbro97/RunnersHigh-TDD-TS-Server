@@ -1,6 +1,16 @@
 import { HttpException, HttpStatus } from "@nestjs/common"
 import { sign, verify } from "jsonwebtoken"
-import { TokenDto } from "../dto/jwt.dto"
+
+interface Token {
+    id:number;
+    email: string;
+    nickname: string;
+    image_url: string;
+    social_type: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
 export default {
     signAccessToken: (data) => {
         return sign(Object.assign({}, data), process.env.ACCESS_TOKEN, { expiresIn: '24h' })
@@ -15,7 +25,7 @@ export default {
         }
         const token = authorization.split(' ')[1]
         try {
-          return (verify(token, process.env.ACCESS_TOKEN)) as TokenDto
+          return (verify(token, process.env.ACCESS_TOKEN)) as Token
         } catch (err) {
           return null
         }
