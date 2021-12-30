@@ -113,5 +113,25 @@ describe('ALL API TEST', () => {
         expect(logoutResponse.body.message).to.eql('유효하지 않은 토큰입니다')        
       })
     })
+
+    describe('(POST) /users/signout', () => {
+      it("토큰값이 있고 회원탈퇴에 성공한경우, '회원탈퇴 성공했습니다' 메시지와 상태코드 200이 응답에 포함되어야 합니다", async () => {
+        const loginInfo = {
+          email: 'kimbro8@test.com',
+          password: 'hp01300130'
+        }
+        const loginResponse = await request(app.getHttpServer()).post('/users/login').send(loginInfo)
+        
+        const logoutResponse =  await request(app.getHttpServer()).post('/users/signout').set('authorization', `Bearer ${loginResponse.body.data.accessToken}`)
+        expect(logoutResponse.status).to.eql(200)
+        expect(logoutResponse.body.message).to.eql('회원탈퇴 성공했습니다')
+      })
+
+      it("토큰값이 없는경우, '유효하지 않은 토큰입니다' 메시지와 상태코드 401이 응답에 포함되어야 합니다", async () => {
+        const logoutResponse =  await request(app.getHttpServer()).post('/users/signout')
+        expect(logoutResponse.status).to.eql(401)
+        expect(logoutResponse.body.message).to.eql('유효하지 않은 토큰입니다')        
+      })
+    })
   })
 });
