@@ -61,8 +61,57 @@ describe('ALL API TEST', () => {
       })
     })
 
+    describe('(POST) /users/login', () => {
+      it("로그인에 성공했을겨우, '로그인에 성공했습니다' 메시지와 상태코드 200, Token값이 응답에 포함되어야 합니다", async () => {
+        const loginInfo = {
+          email: 'kimbro@test.com',
+          password: 'hp01300130'
+        }
 
+        const response = await request(app.getHttpServer()).post('/users/login').send(loginInfo)
+        expect(response.status).to.eql(200)
+        expect(response.body.message).to.eql('로그인에 성공했습니다')
+        expect(response.body.data).to.have.keys('accessToken')
+      })
+
+      it("로그인시 모든 정보가 들어오지 않은경우, '모든 정보가 필요합니다' 메시지와 상태코드 422가 응답에 포함되어야 합니다", async () => {
+        const loginInfo = {
+          email: 'kimbro@test.com'
+        }
+        const response = await request(app.getHttpServer()).post('/users/login').send(loginInfo)
+        expect(response.status).to.eql(422)
+        expect(response.body.message).to.eql('모든 정보가 필요합니다')     
+      })
+
+      it("로그인시 로그인 정보가 일치하지 않은경우, '로그인 정보가 일치하지 않습니다' 메시지와 상태코드 400가 응답에 포함되어야 합니다", async () => {
+        const loginInfo = {
+          email: 'kimbro@test.com',
+          password: 'hp12341234'
+        }
+        const response = await request(app.getHttpServer()).post('/users/login').send(loginInfo)
+        expect(response.status).to.eql(400)
+        expect(response.body.message).to.eql('로그인 정보가 일치하지 않습니다')     
+      })
+    })
+
+    describe('(POST) /users/logout', () => {
+      it("토큰값이 있고 로그아웃에 성공한경우, '로그아웃에 성공했습니다' 메시지와 상태코드 200이 응답에 포함되어야 합니다", async () => {
+        const loginInfo = {
+          email: 'kimbro@test.com',
+          password: 'hp01300130'
+        }
+        const loginResponse = await request(app.getHttpServer()).post('/users/login').send(loginInfo)
+        
+        const logoutResponse =  await request(app.getHttpServer()).post('/users/logout').set('authorization', `Bearer ${loginResponse.body.data.accessToken}`)
+        expect(logoutResponse.status).to.eql(200)
+        expect(logoutResponse.body.message).to.eql('로그아웃에 성공했습니다')
+      })
+
+      it("토큰값이 없는경우, '유효하지 않은 토큰입니다' 메시지와 상태코드 401이 응답에 포함되어야 합니다", async () => {
+        const logoutResponse =  await request(app.getHttpServer()).post('/users/logout')
+        expect(logoutResponse.status).to.eql(401)
+        expect(logoutResponse.body.message).to.eql('유효하지 않은 토큰입니다')        
+      })
+    })
   })
-
-
 });
