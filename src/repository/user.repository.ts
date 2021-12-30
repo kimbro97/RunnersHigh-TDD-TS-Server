@@ -3,7 +3,8 @@ import { User } from "../entitys/user.entity";
 import { EntityRepository, Repository } from "typeorm";
 import * as bcrypt from 'bcryptjs'
 import { BadRequestException, ConflictException, HttpException, HttpStatus, UnprocessableEntityException } from "@nestjs/common";
-import { LoginDto } from "../dto/login-user.dto";
+import { LoginDto } from '../dto/login-user.dto';
+import { sign } from 'jsonwebtoken';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
@@ -47,7 +48,9 @@ export class UserRepository extends Repository<User> {
     if (!decryption) {
       throw new BadRequestException({ message: '로그인 정보가 일치하지 않습니다' })
     } else {
-      return 
+      delete userInfo.password
+      const accessToken = sign(Object.assign({}, userInfo), process.env.ACCESS_TOKEN, { expiresIn: '24h' })
+      throw new HttpException({data: { accessToken }, message: '로그인에 성공했습니다'}, HttpStatus.OK)
     }
   }
 }
