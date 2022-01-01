@@ -4,10 +4,9 @@ import { EntityRepository, Repository } from "typeorm";
 import * as bcrypt from 'bcryptjs'
 import { BadRequestException, ConflictException, HttpException, HttpStatus, UnprocessableEntityException } from "@nestjs/common";
 import { LoginDto } from '../dto/login-user.dto';
-import tokenFunctoin from '../functions/token'
+import { EditUserInfoDto } from "../dto/edit-user.dto";
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
-
    async createUser(createUserDto: CreateUserDto): Promise<void> {
       
       const { nickname , email, password } = createUserDto
@@ -34,7 +33,7 @@ export class UserRepository extends Repository<User> {
       }
   }
 
-  async loginUser(loginDto: LoginDto): Promise<User> {
+  async loginUser(loginDto: LoginDto, jwtToken): Promise<User> {
     const { email, password } = loginDto
 
     if (!email || !password) {
@@ -48,8 +47,28 @@ export class UserRepository extends Repository<User> {
       throw new BadRequestException({ message: '로그인 정보가 일치하지 않습니다' })
     } else {
       delete userInfo.password
-      const accessToken = tokenFunctoin.signAccessToken(userInfo)
-      return tokenFunctoin.sendAccessToken(accessToken)
+      const accessToken = jwtToken.signAccessToken(userInfo)
+      return jwtToken.sendAccessToken(accessToken)
     }
+  }
+
+  async editUserInfo(accessToken, userImageUrl: string, editUserDto: EditUserInfoDto){
+    const userInfo = await this.findOne({id: accessToken.id})
+
+      if (userImageUrl) {
+        userInfo.image_url = userImageUrl
+      }
+      if (editUserDto.nickname) {
+        userInfo.nickname = editUserDto.nickname
+      }
+      if (editUserDto.password) {
+        const hashedPassword = await bcrypt.hash(editUserDto.password, 10)
+        userInfo.password = hashedPassword
+      }
+      await this.save(userInfo)
+      await delete userInfo.password
+      await delete userInfo.createdAt
+      await delete userInfo.updatedAt
+      throw new HttpException({data: userInfo, message: '닉네임, 비밀번호 또는 프로필 이미지 변경에 성공했습니다'},HttpStatus.CREATED)
   }
 }
