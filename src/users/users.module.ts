@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { MulterS3 } from '../functions/multer.option';
+import { JwtToken } from '../functions/jwt.option';
 import { UserRepository } from '../repository/user.repository';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
@@ -9,6 +11,6 @@ import { UsersService } from './users.service';
     TypeOrmModule.forFeature([UserRepository])
   ],
   controllers: [UsersController],
-  providers: [UsersService]
+  providers: [UsersService, JwtToken, MulterS3]
 })
 export class UsersModule {}
