@@ -114,7 +114,7 @@ describe('ALL API TEST', () => {
       })
     })
 
-    describe('(POST) /users/signout', () => {
+    describe('(DELETE) /users/userinfo', () => {
       it("토큰값이 있고 회원탈퇴에 성공한경우, '회원탈퇴 성공했습니다' 메시지와 상태코드 200이 응답에 포함되어야 합니다", async () => {
         const loginInfo = {
           email: 'kimbro8@test.com',
@@ -122,16 +122,74 @@ describe('ALL API TEST', () => {
         }
         const loginResponse = await request(app.getHttpServer()).post('/users/login').send(loginInfo)
         
-        const logoutResponse =  await request(app.getHttpServer()).post('/users/signout').set('authorization', `Bearer ${loginResponse.body.data.accessToken}`)
+        const logoutResponse =  await request(app.getHttpServer()).delete('/users/userinfo').set('authorization', `Bearer ${loginResponse.body.data.accessToken}`)
         expect(logoutResponse.status).to.eql(200)
         expect(logoutResponse.body.message).to.eql('회원탈퇴 성공했습니다')
       })
 
       it("토큰값이 없는경우, '유효하지 않은 토큰입니다' 메시지와 상태코드 401이 응답에 포함되어야 합니다", async () => {
-        const logoutResponse =  await request(app.getHttpServer()).post('/users/signout')
+        const logoutResponse =  await request(app.getHttpServer()).delete('/users/userinfo')
         expect(logoutResponse.status).to.eql(401)
         expect(logoutResponse.body.message).to.eql('유효하지 않은 토큰입니다')        
       })
     })
+
+    describe('(GET) /users/userinfo', () => {
+      it("토큰값이 있고 회원정보를 조회할경우, '회원정보 조회에 성공했습니다' 메시지와 상태코드 200이 응답에 포함되어야 합니다", async () => {
+        const loginInfo = {
+          email: 'kimbro@test.com',
+          password: 'hp01300130'
+        }
+        const loginResponse = await request(app.getHttpServer()).post('/users/login').send(loginInfo)
+        
+        const logoutResponse =  await request(app.getHttpServer()).get('/users/userinfo').set('authorization', `Bearer ${loginResponse.body.data.accessToken}`)
+        expect(logoutResponse.status).to.eql(200)
+        expect(logoutResponse.body.message).to.eql('회원정보 조회에 성공했습니다')
+        expect(logoutResponse.body.data.userInfo).to.eql({
+          id: 5,
+          email: "kimbro@test.com",
+          nickname: "kimbro",
+          image_url: "https://runnershigh-1.s3.ap-northeast-2.amazonaws.com/1639037178613.jpg",
+          social_type: "일반"
+        })
+      })
+
+      it("토큰값이 없는경우, '유효하지 않은 토큰입니다' 메시지와 상태코드 401이 응답에 포함되어야 합니다", async () => {
+        const logoutResponse =  await request(app.getHttpServer()).get('/users/userinfo')
+        expect(logoutResponse.status).to.eql(401)
+        expect(logoutResponse.body.message).to.eql('유효하지 않은 토큰입니다')        
+      })
+    })
+   
+    describe('(PATCH) /users/userinfo', () => {
+      it("토큰값이 있고 회원정보를 변경할경우, '닉네임, 비밀번호 또는 프로필 이미지 변경에 성공했습니다' 메시지와 상태코드 201이 응답에 포함되어야 합니다", async () => {
+        const loginInfo = {
+          email: 'kimbro@test.com',
+          password: 'hp01300130'
+        }
+        const loginResponse = await request(app.getHttpServer()).post('/users/login').send(loginInfo)
+        const editUserInfo = {
+          password: 'hp01300130',
+          nickname: 'kimbro',
+          image_url: ''
+        }
+        const logoutResponse =  await request(app.getHttpServer()).patch('/users/userinfo').send(editUserInfo).set('authorization', `Bearer ${loginResponse.body.data.accessToken}`)
+        expect(logoutResponse.status).to.eql(201)
+        expect(logoutResponse.body.message).to.eql('닉네임, 비밀번호 또는 프로필 이미지 변경에 성공했습니다')
+        expect(logoutResponse.body.data.userInfo).to.eql({
+          id: 5,
+          email: "kimbro@test.com",
+          nickname: "kimbro",
+          image_url: "https://runnershigh-1.s3.ap-northeast-2.amazonaws.com/1639037178613.jpg",
+          social_type: "일반"
+        })
+      })
+
+      it("토큰값이 없는경우, '유효하지 않은 토큰입니다' 메시지와 상태코드 401이 응답에 포함되어야 합니다", async () => {
+        const logoutResponse =  await request(app.getHttpServer()).patch('/users/userinfo')
+        expect(logoutResponse.status).to.eql(401)
+        expect(logoutResponse.body.message).to.eql('유효하지 않은 토큰입니다')        
+      })
+    })    
   })
 });
