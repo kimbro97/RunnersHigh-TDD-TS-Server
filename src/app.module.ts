@@ -10,7 +10,9 @@ import { typeORMConfig } from './configs/typeorm.config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true
+    }),
     TypeOrmModule.forRoot(typeORMConfig),
     UsersModule,
     ChatsModule,
@@ -19,4 +21,5 @@ import { typeORMConfig } from './configs/typeorm.config';
   controllers: [AppController],
   providers: [AppService],
 })
+
 export class AppModule {}
