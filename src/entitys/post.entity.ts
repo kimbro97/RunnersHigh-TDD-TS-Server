@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { User } from "./user.entity";
 
 @Entity()
@@ -25,5 +25,11 @@ export class Post extends BaseEntity {
     longitude: string;
 
     @ManyToOne(type => User, user => user.id, { eager: false })
-    userId: User;
+    user: User;
+
+    @CreateDateColumn()
+    createdAt: string;
+
+    @UpdateDateColumn()
+    updatedAt: string;
 }
