@@ -35,4 +35,12 @@ export class PostsService {
         }
     }
 
+    async deletePost(authorization: string, id: number) {
+        const accessToken = this.jwtToken.isAuthorized(authorization)
+        if (!accessToken) {
+            throw new UnauthorizedException('유효하지 않은 토큰입니다')
+        } else {
+            return this.postRepository.deletePost(id)
+        }
+    }
 }
