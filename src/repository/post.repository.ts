@@ -1,6 +1,6 @@
 import { Post } from "../entitys/post.entity";
 import { EntityRepository, Repository } from "typeorm";
-import { HttpException, HttpStatus } from "@nestjs/common";
+import { HttpException, HttpStatus, NotFoundException } from "@nestjs/common";
 import { CreatePostDto } from "src/dto/create-post.dto";
 
 @EntityRepository(Post)
@@ -34,5 +34,15 @@ export class PostRepository extends Repository<Post> {
         })
         await this.save(post)
         throw new HttpException({data: post, message: '게시물 작성에 성공했습니다'}, HttpStatus.CREATED)
+    }
+
+    async deletePost(id: number) {
+        const chekedPost = await this.delete({id})
+        
+        if (chekedPost.affected === 0) {
+            throw new NotFoundException('해당 게시물을 찾을 수 없습니다')
+        } else {
+            throw new HttpException({message: '게시물 삭제에 성공했습니다'}, HttpStatus.OK)
+        }
     }
 }
