@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Headers, Param, UseInterceptors, UploadedFile, Body, UnauthorizedException } from '@nestjs/common'
+import { Controller, Get, Post, Headers, Param, UseInterceptors, UploadedFile, Body, UnauthorizedException, Delete } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtToken } from '../functions/jwt.option';
 import { CreatePostDto } from '../dto/create-post.dto';
@@ -28,5 +28,10 @@ export class PostsController {
         } else {
             return this.postsService.createPost(accessToken, file, createPostDto)
         }
+    }
+
+    @Delete('/:postid')
+    deletePost(@Headers('authorization') authorization: string, @Param('postid') id: number) {
+        return this.postsService.deletePost(authorization, id)
     }
 }
